@@ -1,0 +1,156 @@
+openapi: 3.0.0
+info:
+  title: Ethereum Transaction Parser API
+  version: 1.0.0
+  description: API to query and subscribe to Ethereum transactions
+
+paths:
+  /block:
+    get:
+      summary: Get the current block number
+      description: Retrieves the last processed block number from the blockchain.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                 $ref: '#/components/schemas/CurrentBlockResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "internal server error"
+  /subscribe:
+    post:
+      summary: Subscribe to an address
+      description: Adds a given Ethereum address to the list of observed addresses.
+      parameters:
+        - in: query
+          name: address
+          required: true
+          description: The Ethereum address to subscribe to.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful subscription
+          content:
+            application/json:
+              schema:
+                 $ref: '#/components/schemas/SubscribeResponse'
+        '400':
+          description: Bad request, address parameter required
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "address query param is required"
+        '409':
+          description: Conflict, address already subscribed
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "provided address is already subscribed"
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "internal server error"
+
+  /transactions:
+    get:
+      summary: Get transactions for an address
+      description: Retrieves a list of transactions associated with a given Ethereum address.
+      parameters:
+        - in: query
+          name: address
+          required: true
+          description: The Ethereum address to get transactions for.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                 $ref: '#/components/schemas/TransactionsResponse'
+        '400':
+          description: Bad request, address parameter required
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "address query param is required"
+        '404':
+          description: Not found
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "the address does not exist in our records"
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "internal server error"
+
+components:
+    schemas:
+      Transaction:
+        type: object
+        properties:
+            hash:
+              type: string
+              example: "0xabc123..."
+            from:
+              type: string
+              example: "0xdef456..."
+            to:
+              type: string
+              example: "0xghi789..."
+            value:
+              type: string
+              example: "1000000000000000000"
+            blockNumber:
+              type: string
+              example: "12345"
+      CurrentBlockResponse:
+        type: object
+        properties:
+          msg:
+            type: string
+            example: "success"
+          data:
+            type: object
+            properties:
+              currentBlock:
+                type: integer
+                example: 12345
+      SubscribeResponse:
+        type: object
+        properties:
+          msg:
+            type: string
+            example: "success"
+      TransactionsResponse:
+         type: object
+         properties:
+           msg:
+             type: string
+             example: "success"
+           data:
+             type: object
+             properties:
+               transactions:
+                 type: array
+                 items:
+                   $ref: '#/components/schemas/Transaction'

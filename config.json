@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0",
+  "chainProcessInterval": 5000,
+  "log": {
+    "file": "/var/log/ethereum-blockchain-parser/app.log",
+    "level": "info"
+  },
+  "http":{
+    "server": {
+      "port": 9600,
+      "ipAddress": "0.0.0.0"
+    }
+  }
+}
